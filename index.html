@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Excel Viewer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+body{font-family:system-ui,sans-serif;margin:16px}
+button{padding:8px 14px;border:1px solid #ccc;background:#f4f4f4;cursor:pointer}
+button.active{background:#fff;font-weight:600}
+#view{overflow-x:auto;margin-top:8px}
+table{border-collapse:collapse}
+td,th{border:1px solid #ddd;padding:6px 10px}
+</style></head><body>
+<div id="tabs"></div><div id="view">Loading...</div>
+<script>
+fetch('data.xlsx').then(r => r.arrayBuffer()).then(buf => {
+  const wb = XLSX.read(buf);
+  const tabs = document.getElementById('tabs'), view = document.getElementById('view');
+  const show = (name, btn) => {
+    view.innerHTML = XLSX.utils.sheet_to_html(wb.Sheets[name]);
+    tabs.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  };
+  wb.SheetNames.forEach((name, i) => {
+    const b = document.createElement('button');
+    b.textContent = name;
+    b.onclick = () => show(name, b);
+    tabs.appendChild(b);
+    if (i === 0) show(name, b);
+  });
+}).catch(e => document.getElementById('view').textContent = 'Error: ' + e);
+</script></body></html>
